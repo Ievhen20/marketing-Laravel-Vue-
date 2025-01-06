@@ -7,6 +7,7 @@ import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
   templateData: Array,
+  openTemplateModal: Boolean,
 });
 
 </script>
@@ -14,7 +15,6 @@ const props = defineProps({
 <template>
 
   <Head title="Dashboard" />
-
   <AuthenticatedLayout>
     <div class="w-full pt-24 px-[24px]">
       <div class="flex gap-2 flex-col lg:flex-row">
@@ -34,4 +34,5 @@ const props = defineProps({
       </div>
     </div>
   </AuthenticatedLayout>
+
 </template>

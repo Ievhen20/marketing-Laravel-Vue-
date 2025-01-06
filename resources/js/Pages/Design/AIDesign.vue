@@ -5,14 +5,17 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import SideBar from '@/Components/SideBar.vue';
 import TabContent1 from '@/Components/AIDesign/TabContent1.vue';
-import { exploreIdeas, templateData, filteredImages, collectionData, workAndProducts, mediaData, printData, papers, photoData, bannerData } from '@/Utils/ImgData';
+import { exploreIdeas, templateData, filteredImages,  templateImages, collectionData, workAndProducts, mediaData, printData, papers, photoData, bannerData, generatedImages } from '@/Utils/ImgData';
 import { languages } from '@/Utils/language';
 import TabContent2 from '@/Components/AIDesign/TabContent2.vue';
 import TabContent3 from '@/Components/AIDesign/TabContent3.vue';
 import TabContent4 from '@/Components/AIDesign/TabContent4.vue';
+import DescribeModal from '@/Components/AIDesign/DescribeModal.vue';
+import TemplateModal from '@/Components/AIDesign/TemplateModal.vue';
 
 const activeTab = ref(1);
 const childTabNum = ref(1);
+const selectedFilter = ref(0);
 
 // ======== Define state for Tab-1 =========
 const imageNum = ref(8);
@@ -22,6 +25,8 @@ const advancedSetting = ref(false);
 // ======== Define state for Tab-2 ========
 const openFilterData = ref(false);
 const filteredTitle = ref('');
+const openDescribeModal = ref(false);
+const openTemplateModal = ref(false);
 
 const setActiveTab = (tabNumber) => {
   activeTab.value = tabNumber;
@@ -62,6 +67,28 @@ const returnSecondTab = () => {
   openFilterData.value = false;
   setActiveTab(2);
 }
+//add Border-primary-color to selected filter
+const selectFilter = (index) => {
+  selectedFilter.value = index;
+}
+
+const setOpenDescribeModal = () => {
+  openDescribeModal.value = !openDescribeModal.value;
+}
+
+const closeDescribeModal = () => {
+  openDescribeModal.value = false;
+}
+
+const setOpenTemplateModal = () => {
+  openTemplateModal.value = true;
+  openDescribeModal.value = false;
+}
+
+const closeTemplateModal = () => {
+  console.log(openTemplateModal.value);
+  openTemplateModal.value = false;
+}
 
 </script>
 
@@ -81,25 +108,46 @@ const returnSecondTab = () => {
             <div v-if="openFilterData">
               <div class="w-full rounded-[15px] pt-[19px]">
                 <div class="flex flex-col gap-[26px]">
-                  <h4 class="px-[12px] flex justify-start gap-[15px] text-[20px] text-[#1D2939] font-sans1 font-[600] items-center">
+                  <h4 class="px-[12px] flex justify-start gap-[15px] text-[20px] text-[#1D2939] font-sans1 font-[620] items-center">
                     <img src="/assets/Image/icon/preview-icon.png" alt="Preview Icon" @click="returnSecondTab" /> {{ filteredTitle }}
                   </h4>
-                  <div class="filtered-images">
+                  <div class="filtered-images min-h-[600px]">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[15px]">
                       <div 
                         v-for="(filterImage, index) in filteredImages"
-                        class="flex justify-center items-center py-[28px] px-[15px] bg-[#F2F4F7] rounded-[5px]"
-                      >
+                        :key="index"
+                        :class="['flex justify-center items-center py-[28px] px-[15px] bg-[#F2F4F7] rounded-[5px] border-[1px]', selectedFilter === index ? 'border-primary-color' : 'border-transparent']"
+                        @click="selectFilter(index)"
+                        >
                         <img :src="filterImage.url" alt="Template" />
                       </div>
                     </div>
                   </div>
                   <div class="flex justify-end items-center gap-[10px]">
                     <button class="w-[173px] h-[44px] text-[15px] text-primary-color font-sans1 font-[600] rounded-[8px] p-[10px] border-[1px] border-primary-color">Create variation</button>
-                    <button class="w-[173px] h-[44px] text-[15px] text-white font-sans1 bg-primary-color font-[600] rounded-[8px] p-[10px] border-[1px] border-primary-color">Next</button>
+                    <button 
+                      class="w-[173px] h-[44px] text-[15px] text-white font-sans1 bg-primary-color font-[600] rounded-[8px] p-[10px] border-[1px] border-primary-color"
+                      @click="setOpenDescribeModal"
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
               </div>
+              <!-- DescribeModal -->
+              <DescribeModal
+                v-if="openDescribeModal"
+                :openTemplateModal="openTemplateModal"
+                @closeDescribeModal="closeDescribeModal"
+                @setOpenTemplateModal="setOpenTemplateModal"
+              />
+              <!-- Template Modal -->
+              <TemplateModal 
+                v-if="openTemplateModal"
+                :templateImages="templateImages"
+                :openTemplateModal="openTemplateModal"
+                @closeTemplateModal="closeTemplateModal"
+              />
             </div>
             <div v-else>
               <div class="flex gap-4 justify-between items-center">
