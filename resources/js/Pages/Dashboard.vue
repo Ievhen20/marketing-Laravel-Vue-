@@ -1,6 +1,14 @@
 <script setup>
+
+import { ref } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { templateData } from '@/Utils/ImgData';
 import { Head } from '@inertiajs/vue3';
+
+const props = defineProps({
+  templateData: Array,
+});
+
 </script>
 
 <template>
@@ -8,17 +16,19 @@ import { Head } from '@inertiajs/vue3';
   <Head title="Dashboard" />
 
   <AuthenticatedLayout>
-    <template #header>
-      <h2 class="text-xl font-semibold leading-tight text-gray-800">
-        Dashboard
-      </h2>
-    </template>
-
-    <div class="py-12">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-          <div class="p-6 text-gray-900">
-            You're logged in!
+    <div class="w-full pt-24 px-[24px]">
+      <div class="flex gap-2 flex-col lg:flex-row">
+        <SideBar />
+        <div class="w-full relative flex flex-row">
+          <div 
+            ref="blogRef"
+            class="w-full px-[21px] py-[23px] min-w-[310px] min-h-[85vh] max-h-[85vh] rounded-[15px] bg-[#FFFFFF] overflow-y-auto z-10 custom-scrollbar"
+          >
+            <div>
+              <div class="flex gap-4 justify-between items-center">
+                Design your own brand
+              </div>
+            </div>
           </div>
         </div>
       </div>
