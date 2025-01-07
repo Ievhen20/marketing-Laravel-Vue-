@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { collectionData, exploreIdeas, generatedImages } from '@/Utils/ImgData';
 import ExploreModal from './ExploreModal.vue';
 import GeneratedModal from './GeneratedModal.vue';
@@ -30,6 +30,9 @@ const imageDescription = ref('');
 const isPreviewMenu = ref(false);
 const openGeneratedModal = ref(false);
 const openPreview = ref(false);
+const modalPosition = ref({ top: '0px', left: '0px' });
+const textareaWidth = ref(510);
+const textareaContent = ref('');
 
 // Define emit events to send data back to the parent
 const emit = defineEmits([
@@ -57,8 +60,28 @@ const setActiveChildTab = (tabNumber) => {
 };
 
 // Method to open modal with selected exploreIdea
-const viewPrompt = (exploreIdea) => {
+const viewPrompt = (exploreIdea, event) => {
   selectedIdea.value = exploreIdea; // Assign the selected idea to `selectedIdea` ref
+
+  const clientY = event.clientY;
+  const clientX = event.clientX;
+  const modalHeight = 280;
+  const modalWidth = 380;
+  const windowHeight = window.innerHeight;
+  const windowWidth = window.innerWidth;
+  let adjustedTop = clientY;
+  let adjustedLeft = clientX;
+  if(clientY + modalHeight > windowHeight) {
+    adjustedTop = clientY - modalHeight;
+  }
+  if(clientX + modalWidth > windowWidth) {
+    adjustedLeft = clientX - modalWidth;
+  }
+
+  modalPosition.value = {
+    top: `${adjustedTop}px`,
+    left: `${adjustedLeft}px`
+  };
   isModalVisible.value = true; // Show the modal
 }
 
@@ -100,6 +123,10 @@ const returnGenerated = () => {
   openGeneratedModal.value = true;
 }
 
+const isTextareaLarge = computed(() => {
+  return textareaWidth.value > 510 || textareaWidth.value.length > 0;
+});
+
 </script>
 
 <template>
@@ -111,15 +138,16 @@ const returnGenerated = () => {
       </p>
     </div>
     <div
-      class="generate-form flex flex-row justify-between items-center w-full rounded-[8px] bg-[#F9FAFB] border-[1px] border-[#D0D5DD] text-[16px] mt-[20px] group focus:border-primary-color focus:outline-[2px] focus:outline-[#E7D8FD]">
+      :class="['generate-form', 'flex', 'w-full', 'rounded-[8px]', 'bg-[#F9FAFB]', 'border-[1px]', 'border-[#D0D5DD]', 'text-[16px]', 'mt-[20px]', { 'flex-col': isTextareaLarge, 'flex-row': !isTextareaLarge }]">
       <div class="w-full focus:border-primary-color focus:outline focus:outline-offset-[0px] focus:outline-[2px] focus:outline-[#F4EBFF]">
         <textarea 
           :value="imageDescription" 
           placeholder="Design a beautiful Social media banner.."
-          class="bg-transparent border-none overflow-hidden w-full resize-none h-[32px] my-auto focus:outline-none focus:ring-0 focus:border-none"
+          :class="['bg-transparent', 'border-none', 'overflow-hidden', 'w-full', 'resize-none', 'h-[32px]', 'my-auto', 'focus:outline-none', 'focus:ring-0', 'focus:border-none', {'custom-scrollbar': isTextareaLarge}, { 'h-[60px]': isTextareaLarge }]"
+          @input="textareaWidth = $event.target.offsetWidth"
         ></textarea>
       </div>
-      <div class="flex">
+      <div class="flex justify-end">
         <div class="h-[36px] border-[1px] border-[#E4E7EC] my-auto"></div>
         <h4 class="my-[2px] py-[10px] ml-[30px] pr-[10px] text-[#475467] text-nowrap">Number of Image</h4>
         <div class="flex w-[100px] my-auto border-[1px] border-[#E0E0E0] rounded-[5px] mr-2">
@@ -213,7 +241,7 @@ const returnGenerated = () => {
             >
               <img :src="exploreIdea.url" alt="Explore Idea Image" class="object-center transition-transform duration-300 group-hover:scale-120" />
               <div class="overlay absolute inset-0 flex justify-center items-center bg-[#000000] bg-opacity-50 text-white text-[15px] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                <button class="border-[1px] border-white w-[102px] h-[35px] rounded-[5px] p-auto" @click="viewPrompt(exploreIdea)">
+                <button class="border-[1px] border-white w-[102px] h-[35px] rounded-[5px] p-auto" @click="viewPrompt(exploreIdea, $event)">
                   See prompt
                 </button>
               </div>
@@ -226,6 +254,7 @@ const returnGenerated = () => {
           :explore-idea="selectedIdea" 
           @close-modal="closeModal" 
           @set-title="setTextareaTitle"
+          :modal-position="modalPosition"
         />
       </div>
       <!-- Child Tab-2 My Collections -->
@@ -242,14 +271,14 @@ const returnGenerated = () => {
                 <button class="w-[24px] h-[24px] bg-white flex rounded-[4px] p-[3px] float-right">
                   <div class="relative w-[16px] h-[16px] flex justify-center items-center">
                     <img src="/assets/Image/img/dot-icon.png" alt="Preview Icon" @click="setIsPreviewMenu(collection.index)" />
-                    <div class="preview-btn absolute top-[18px] right-[0px] bg-white text-[#344054] rounded-[6px]">
+                    <!-- <div class="preview-btn absolute top-[18px] right-[0px] bg-white text-[#344054] rounded-[6px]">
                       <ul v-if="isPreviewMenu || collection.index" class="list-style-none text-[14px] font-sans1 font-[400] text-left z-50">
                         <li class="px-[16px] py-[10px] text-nowrap">Preview</li>
                         <li class="px-[16px] py-[10px] text-nowrap">Edit on Designer</li>
                         <li class="px-[16px] py-[10px] text-nowrap">Download</li>
                         <li class="px-[16px] py-[10px] text-nowrap">Delete</li>
                       </ul>
-                    </div>
+                    </div> -->
                   </div>
                 </button>
               </div>

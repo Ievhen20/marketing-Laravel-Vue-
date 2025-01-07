@@ -1,6 +1,9 @@
 <template>
-  <div class="modal-overlay fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-20">
-    <div class="modal-content bg-white p-4 rounded-lg w-[90%] max-w-md">
+  <div class="modal-overlay fixed inset-0 flex justify-center items-center bg-black bg-opacity-0 z-[9999]">
+    <div 
+      class="modal-content bg-white p-4 rounded-lg w-[90%] max-w-md shadow-[0px_2px_4px_0px_rgba(0,0,0,0.2)]"
+      :style="{ top: modalPosition.top, left: modalPosition.left, position: 'absolute' }"  
+    >
       <div class="flex justify-between gap-[19px]">
         <img :src="exploreIdea.url" alt="Explore Idea" class="w-1/2" />
         <p class="w-[241px] font-sans1 text-[14px] text-[#1D2939] font-[400]">{{ exploreIdea.description }}</p>
@@ -17,6 +20,7 @@
 export default {
   props: {
     exploreIdea: Object,
+    modalPosition: Object,
   },
   methods: {
     tryOut() {
